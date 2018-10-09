@@ -1,6 +1,6 @@
 """ board.py """
 
-from question import Question, Orientation
+from .question import Question, Orientation
 from itertools import repeat, chain
 
 

@@ -1,6 +1,6 @@
 """ filedb.py """
 import pickle
-
+import os
 class FileDB:
     """ Text file used to persist data 
     
@@ -10,7 +10,10 @@ class FileDB:
     """
 
     def __init__(self, filename):
-        self.filename = filename
+        if os.path.isfile(filename): 
+            self.filename = filename
+        else:
+            raise FileNotFoundError('Error! Crosswords file does not exist!')
 
     def create(self, crosswords):
         """ Saves the a list of crosswords to the file.
@@ -24,6 +27,7 @@ class FileDB:
     def read_all(self):
         """ Reads all the crosswords from the file. """
         crosswords = []
+
         with open(self.filename, mode="rb") as file:
             try:
                 crosswords = pickle.load(file)

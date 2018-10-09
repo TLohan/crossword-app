@@ -1,0 +1,5 @@
+crossword_app.egg-info/PKG-INFO
+crossword_app.egg-info/SOURCES.txt
+crossword_app.egg-info/dependency_links.txt
+crossword_app.egg-info/entry_points.txt
+crossword_app.egg-info/top_level.txt

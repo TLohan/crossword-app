@@ -1,7 +1,7 @@
-from board import Board
-from question import Question
-from filedb import FileDB
-from clear_screen import clear
+from .board import Board
+from .question import Question
+from .filedb import FileDB
+from .clear_screen import clear
 
 class Main():
 
@@ -9,9 +9,8 @@ class Main():
         self.database = database
         self.__crosswords = self.database.read_all()
         clear()
-        self.__run_user_interface()
 
-    def __run_user_interface(self):
+    def run_user_interface(self):
         """ Initiates the user interface. """
         welcome_msg = 'Welcome to Crossword Program'
         line = '='*len(welcome_msg)
