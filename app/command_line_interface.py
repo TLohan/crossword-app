@@ -3,14 +3,15 @@ from .question import Question
 from .filedb import FileDB
 from .clear_screen import clear
 
-class Main():
+
+class CLI():
 
     def __init__(self, database):
         self.database = database
         self.__crosswords = self.database.read_all()
         clear()
 
-    def run_user_interface(self):
+    def run(self):
         """ Initiates the user interface. """
         welcome_msg = 'Welcome to Crossword Program'
         line = '='*len(welcome_msg)
@@ -26,32 +27,32 @@ class Main():
             def get_mode():
                 print('-> Play crossword (P)')
                 print('-> Create new crossword (C)')
+                print('-> Edit Crossword (E)')
                 print('-> Quit (Q)')
                 print('')
-                return input('>>  ')
+                return input('>>  ').upper()
 
             user_input = get_mode()
 
-            while user_input.upper() != 'C' and user_input.upper() != 'P' and user_input.upper() != 'Q':
+            while user_input != 'C' and user_input != 'P' and user_input!= 'Q' and user_input != 'E':
                 self.__display_error('\nInvalid option. Please try again.\n')
                 user_input = get_mode()
             
-            if user_input.upper() == 'P':
+            if user_input == 'P':
                 clear()
                 self.__play()
                 choose_mode()
-            elif user_input.upper() == 'C':
+            elif user_input == 'C':
                 clear()
                 self.__create_crossword()
+                choose_mode()
+            elif user_input == 'E':
+                self.__edit()
                 choose_mode()
             else:
                 self.__quit_program()
         
         choose_mode()
-
-    def main(self):
-        """  Entry point for the program. """
-        self.__run_user_interface()
     
             
     def __quit_program(self):
@@ -230,6 +231,54 @@ class Main():
                     self.__display_information('Crossword discarded.')
              
         get_confirmation()
+    
+    def __edit(self):
+        self.__display_information('EDIT\n______')
+        print('Select a crossword to edit')
+        for index,xword in enumerate(self.__crosswords):
+            print("{} {}".format(index, xword))
+        
+        def get_crossword_to_edit():
+            try:
+                number = int(input('Number: '))
+                return self.__crosswords[number]
+            except IndexError:
+                self.__display_error('Invalid number! Please try again.')
+                return get_crossword_to_edit()
+            except ValueError:
+                self.__display_error('Must be an integer. Please try again.')
+                return get_crossword_to_edit()
+        
+        crossword_to_edit = get_crossword_to_edit()
+
+        self.__edit_crossword(crossword_to_edit)
+    
+    def __edit_crossword(self, crossword):
+        crossword.print_answers_board()
+        crossword.print_questions()
+        question_key = ''
+
+        def edit_question(key):
+            try:
+                question = crossword.get_question(key)
+                text = input('Question: ')
+                answer = input('Answer: ')
+                if text != '': question.text = text
+                if answer != '': question.answer = answer
+            except KeyError as err:
+                self.__display_error(str(err) + ' Please try again.')
+
+        while question_key != '-1':
+            question_key = input('\nKey: ')
+            if question_key == '-1': continue
+            clear()
+            edit_question(question_key)
+            crossword.print_answers_board()
+            crossword.print_questions()
+        
+        self.database.save(self.__crosswords)
+        self.__display_success('Edit saved!')
+
 
     def __display_error(self, message):
         """ Prints message in red """
@@ -250,16 +299,16 @@ if __name__ == '__main__':
     from unittest import mock
     from io import StringIO
 
-    class TestMain(unittest.TestCase):
+    class TestCLI(unittest.TestCase):
 
         def setUp(self):
             print('In test set up')
             filedb = FileDB('test.txt')
-            self.main = Main(filedb)
+            self.cli = CLI(filedb)
         
         def test_get_boolean_input_from_user(self):
             with mock.patch('builtins.input', return_value='Y'):
-                self.assertTrue(self.main.__get_boolean_input_from_user('Did this work?'))
+                self.assertTrue(self.cli.__get_boolean_input_from_user('Did this work?'))
 
         # def test_create_crossword(self):
         #     self.main._Main__create_crossword()

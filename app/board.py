@@ -158,11 +158,19 @@ class Board(object):
 
     def print_questions(self):
         """ Prints the questions to the command line """
-        for question in self.__key_to_question_dict.values():
+        max_question_length = max(map(lambda question: len(question.text), self.questions))
+        questions_across = list(filter(lambda question: question.orientation == Orientation.ACROSS, self.questions))
+        questions_down = list(filter(lambda question: question.orientation == Orientation.DOWN, self.questions))
+
+        def format_question(question):
+            """ Formats the question by whether it has been guessed or not """
             if question.guessed:
-                print("\033[1;30m{}:\t{}  ({})\033[0m".format(question.key, question.text, question.length()))
+                return "\033[1;30m{}:\t{}  ({})\033[0m".format(question.key, question.text, question.length()) + " "*(max_question_length - len(question.text))
             else:
-                print("\033[1;37m{}:\t{}  ({})\033[0m".format(question.key, question.text, question.length()))
+                return "\033[1;37m{}:\t{}  ({})\033[0m".format(question.key, question.text, question.length()) + " "*(max_question_length - len(question.text))
+
+        for q_across,q_down in zip(questions_across, questions_down):
+            print("{} \t {}".format(format_question(q_across), format_question(q_down)))
 
 
 
